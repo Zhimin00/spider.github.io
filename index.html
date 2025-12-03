@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="An image matching framework for image pairs from wide baselines.">
+    <meta name="keywords" content="SPIDER">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SPIDER: Spatial Image CorresponDence Estimator for Robust Calibration</title>
+
+    <link rel="icon" type="image/x-icon" href="static/images/android-chrome-512x512.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-PYVRSFMDRL');
+    </script>
+
+    <meta property="og:image" content="https://cut3r.github.io/static/images/icon.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SPIDER: Spatial Image CorresponDence Estimator for Robust Calibration">
+    <meta name="twitter:description"
+        content="An image matching framework for image pairs from wide baselines.">
+    <meta name="twitter:image" content="https://cut3r.github.io/static/images/icon.png">
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans:400,600|Noto+Sans:400,600|Castoro:400,600"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-normalize.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/tabler-icons-outline.min.css"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="./static/css/bulma.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.4/dist/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="./static/css/index.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@latest/dist/model-viewer.js"></script>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src="./static/js/fontawesome.all.min.js"></script>
+    <script defer src="./static/js/bulma-carousel.min.js"></script>
+    <script defer src="./static/js/index.js"></script>
+    <script defer src="./static/js/lazy.js"></script>
+    <script>
+        MathJax = {
+          tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}
+        };
+      </script>
+      <script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+      </script>
+
+    <style>
+        .center-image {
+            display: block;
+            margin: 0 auto;
+        }
+
+
+        .blend-img-item {
+            background: #f5f5f5;
+        }
+
+        .item {
+            margin: 10px;
+        }
+
+        .blend-img-background {
+            mix-blend-mode: multiply;
+        }
+
+        #interactive {
+            position: relative;
+            display: inline-block;
+            width: 768px;
+            aspect-ratio: 16/9;
+            max-width: 100%;
+            border: 2px solid #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 4px #000;
+
+        }
+
+        #interactive canvas,
+        #interactive #glfailed,
+        #interactive #loading {
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        #interactive #glfailed {
+            color: #f88;
+            background: black;
+            display: none;
+        }
+
+        #interactive #loading {
+            color: #000;
+            font-size: 32px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+        }
+
+        .iframe-container {
+            width: 50%;
+            max-width: 32em;
+        }
+
+        .vframe {
+            border-radius: 0.5em;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 32 / 27.5;
+            max-width: 32em;
+            max-height: 27.5em;
+            border: none;
+            box-shadow: 0 0 1em 0em rgba(0, 0, 0, 0.15);
+        }
+
+        .large-vframe {
+            border-radius: 0.5em;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 32 / 18;
+            max-width: 64em;
+            max-height: 36em;
+            border: none;
+            box-shadow: 0 0 1em 0em rgba(0, 0, 0, 0.15);
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px 0;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .modelviewer-container {
+            width: 50%;
+            max-width: 32em;
+        }
+
+        model-viewer {
+            border-radius: 0.5em;
+            width: 100%;
+            max-width: 32em;
+            max-height: 27.5em;
+            height: auto;
+            aspect-ratio: 32 / 27.5;
+            border: none;
+            box-shadow: 0 0 1em 0em rgba(0, 0, 0, 0.15);
+        }
+
+        .siframe-class {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            gap: 1vw;
+            padding: 1vw;
+            align-items: start;
+        }
+
+        .siframe-class .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 1vw;
+            flex: 1 0 40%;
+            max-width: 384px;
+        }
+
+        .siframe-class .image-grid img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .siframe-class .iframe-container {
+            flex: 1 0 60%;
+            max-width: 640px;
+        }
+
+        .siframe-class iframe {
+            width: 100%;
+            border-radius: 0.5em;
+            max-width: 640px;
+            height: auto;
+            aspect-ratio: 5 / 4;
+            border: none;
+            box-shadow: 0 0 1em 0em rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 768px) {
+
+            .large-vframe {
+                width: 100%;
+            }
+
+            .iframe-container {
+                width: 100%;
+            }
+
+            model-viewer {
+                max-width: 100%;
+                margin: 0 auto;
+            }
+        }
+
+        .load img {
+            width: 100px;
+            height: 70px;
+            object-fit: cover;
+            margin: 4px;
+            border: 2px solid #fff;
+            box-shadow: 0 0 4px #888;
+            border-radius: 6px;
+            vertical-align: bottom;
+        }
+
+        .load img:active {
+            box-shadow: 0 0 4px #000;
+            opacity: .8;
+        }
+
+        .megabuttons {
+            position: absolute;
+            left: 5px;
+            bottom: 5px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        nav {
+            text-align: center;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            width: 100%;
+            gap: 10px;
+        }
+
+        nav ul li {
+            flex: 1;
+            display: flex;
+            margin: 0;
+        }
+
+        nav ul li a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            color: #363636;
+            padding: 10px 20px;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            min-height: 50px;
+            flex-grow: 1;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+
+        nav ul li a:hover {
+            background-color: #e4e4e4;
+            transform: scale(1.05);
+        }
+
+        nav ul li a:active {
+            background-color: #d3d3d3;
+            transform: scale(0.95);
+        }
+
+        nav ul li a.active {
+            background-color: #cccccc; /* Change color to indicate active tab */
+            color: #000000; /* Optional: Change text color if needed */
+        }
+
+
+        .dynamic-section {
+            display: none;
+            padding: 1rem 0;
+        }
+
+
+
+        .grid-container-2x6 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 10px;
+            padding: 20px;
+            max-width: 80%;
+            margin: auto;
+        }
+
+        .grid-container-2x6 img {
+            width: 100%;
+            height: auto;
+        }
+
+        .grid-container-1x6 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: repeat(1, auto);
+            gap: 10px;
+            padding: 20px;
+            max-width: 80%;
+            margin: auto;
+        }
+
+        .grid-container-1x6 img {
+            width: 100%;
+            height: auto;
+        }
+
+        .panel-style {
+            background-color: #fafafa;
+            padding: 20px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+    </style>
+    
+</head>
+
+<body>
+
+    <section class="hero">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered" style="margin-bottom: 0em">
+                    <div class="column is-max-desktop has-text-centered">
+                        <h1 class="title is-2 publication-title" style="margin-bottom:0rem">
+                            <img src="./static/images/android-chrome-512x512.png" alt="ICON"
+                                style="max-width: 96px; vertical-align: middle;">
+                            <strong>SPIDER: Spatial Image CorresponDence Estimator for Robust Calibration</strong>
+                        </h1>
+                    </div>
+                </div>
+                <div class="columns is-centered">
+                    <div class="column is-four-fifths has-text-centered">
+                        <div class="is-size-4 publication-authors">
+                            <span class="author-block">
+                                <a href="https://scholar.google.com/citations?user=CARGU-8AAAAJ&hl=zh-CN">Zhimin Shao</a><sup>1</sup></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span class="author-block">
+                                <a href="https://scholar.google.com/citations?user=pbRu-GQAAAAJ&hl=en">Abhay Yadav</a><sup>1</sup>&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                            <span class="author-block">
+                                <a href="https://engineering.jhu.edu/faculty/rama-chellappa/">Rama Chellappa</a>
+                                <sup>1</sup>&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                            <span class="author-block">
+                                <a href="https://sites.google.com/view/cheng-peng/home">Cheng Peng</a><sup>1</sup>&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                        </div>
+
+                        <div class="is-size-4 publication-authors">
+                            <span class="author-block"><sup>1</sup>Johns Hopkins University </span>
+                        </div>
+
+                        <div class="column has-text-centered">
+                            <div class="publication-links">
+                                <span class="link-block">
+                                    <a href="https://www.arxiv.org/abs/2511.17750" class="external-link button is-normal is-rounded is-dark">
+                                        <span class="icon">
+                                            <i class="ai ai-arxiv"></i>
+                                        </span>
+                                        <span>arXiv</span>
+                                    </a>
+                                </span>
+                                <!-- Video Link. -->
+
+
+                                <span class="link-block">
+                                    <a href="https://github.com/Zhimin00/spider" class="external-link button is-normal is-rounded is-dark">
+                                        <span class="icon">
+                                            <i class="fab fa-github"></i>
+                                        </span>
+                                        <span>Code</span>
+                                    </a>
+                                </span>
+
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero teaser">
+        <div class="container is-max-desktop">
+          <div class="hero-body">
+            <img src="./static/images/teaser.png"
+              class="interpolation-image"
+              alt="Interpolate start reference image."/>
+            <h2 class="subtitle has-text-centered">
+                Visualized in 3D, SPIDER (in green) jointly predicts pixel-wise warps and feature descriptors even across large viewpoint changes, unifying
+                the appearance sensitivity of RoMa (in red) and the geometric consistency of Aerial-MASt3R (in blue) within a single framework. This enables accurate
+                camera calibration and pose estimation, achieving and surpassing State-Of-the-Art performance on challenging benchmarks.
+            </h2>
+          </div>
+      
+      
+        </div>
+      </section>
+
+      <section class="section hero is-light">
+        <div class="container is-max-desktop">
+          <!-- Abstract. -->
+          <div class="columns is-centered has-text-centered">
+            <div class="column is-four-fifths">
+              <h2 class="title is-3">Abstract</h2>
+              <div class="content has-text-justified">
+                <p>
+                    Reliable image correspondences form the foundation of vision-based spatial perception, enabling recovery of 3D structure and camera poses. 
+                    However, unconstrained feature matching across domains such as aerial, indoor, and outdoor scenes remains challenging due to large variations in appearance, scale and viewpoint. 
+                    Feature matching has been conventionally formulated as a 2D-to-2D problem; however, recent 3D foundation models provides spatial feature matching properties based on two-view geometry. 
+                    While powerful, we observe that these spatially coherent matches often concentrate on dominant planar regions, e.g., walls or ground surfaces, while being less sensitive to fine-grained geometric details, particularly under large viewpoint changes. 
+                    To better understand these trade-offs, we first perform linear probe experiments to evaluate the performance of various vision foundation models for image matching. 
+                    Building on these insights, we introduce SPIDER, a universal feature matching framework that integrates a shared feature extraction backbone with two specialized network heads for estimating both 2D-based and 3D-based correspondences from coarse to fine. 
+                    Finally, we introduce an image-matching evaluation benchmark that focuses on unconstrained scenarios with large baselines. 
+                    SPIDER significantly outperforms SoTA methods, demonstrating its strong ability as a universal image-matching method.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section class="section">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column is-four-fifths">
+              <div class="columns is-centered has-text-centered">
+              <h2 class="title is-3">SPIDER</h2>
+            </div>
+                <p>
+                    Given two input images $I^A$ and $I^B$, our method builds on 3D VFM features and ConvNet features to combine
+                    semantic alignment and geometric consistency. A dual-head architecture operates in a coarse-to-fine manner: (1) the descriptor head
+                    aggregates multi-scale features through attention-based Fusion Gates to produce geometry-aware descriptors and confidence maps; (2) the
+                    warp head predicts dense correspondence fields and confidence maps, progressively refined across multiple scales. Final correspondences
+                    are sampled from the predicted warp and fastNN.
+      
+                </p>
+                <img src="./static/images/spider_net.png" style="margin-top: 20px;"/>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+    
+    <section class="section">
+        <div class="container is-max-desktop">
+        <div class="columns is-centered">
+            <div class="column is-four-fifths">
+            <div class="columns is-centered has-text-centered">
+            <h2 class="title is-4">Evaluation on Zero-Shot Benchmark</h2>
+            </div>
+            <img src="./static/images/table1.png"/>
+            <figcaption> SoTA comparison on existing image matching benchmarks, measured by AUC@5. G.R + A.M denotes the concatenation of
+                GIM-RoMa and Aerial-MASt3R. The best result is marked with best in red and second best with second in orange.</figcaption>
+        </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container is-max-desktop">
+        <div class="columns is-centered">
+            <div class="column is-four-fifths">
+            <div class="columns is-centered has-text-centered">
+            <h2 class="title is-4">Visualization</h2>
+            </div>
+            <img src="./static/images/vis_example.png"/>
+            <figcaption> Visual Comparison under unconstrained settings. Image pattern-driven methods, e.g. RoMa, finds diverse matches
+                across many planes; however, matches may be false negatives on two sides of the building. Geometry-driven methods are better
+                at matching planes. This can lead to homography if a confident plane dominates, e.g., when Aerial-MASt3r matches the wrong signs in
+                Urban with high confidence. SPIDER combines both approaches and produces diverse and accurate matches.</figcaption>
+        </div>
+        </div>
+    </section>
+
+    <!-- <section class="section">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <h2 class="title is-3">Method Overview</h2>
+                    <div class="content has-text-centered">
+                        <div>
+                            <img src="./static/images/method1_2-min.jpg" alt="Reconstruction"
+                                class="blend-img-background center-image" width="80%" loading="lazy" />
+                        </div>
+                        <div class="content has-text-justified">
+                            <p>
+                                Given a sequence of images as input, our method performs online dense 3D reconstruction.
+
+                                At the core of our method is a state representation that keeps updating as each new
+                                observation
+                                comes in.
+
+                                Given the current image, we first use a vit encoder to encode it into token
+                                representations.
+                                The image tokens then interact with the state tokens through a joint process of state
+                                update
+                                and
+                                state readout. The final outputs from state readout are the pointmaps and camera
+                                parameters
+                                for
+                                the current observation. At the same time, the state update module incorporates the
+                                current
+                                observation to update the state.
+
+                                We repeat the process for every image, and their outputs accumulate into dense scene
+                                reconstruction over time.
+                            </p>
+                        </div>
+
+                        <div>
+                            <img src="./static/images/method2_2-min.jpg" alt="Inference"
+                                class="blend-img-background center-image" width="80%" loading="lazy" />
+                        </div>
+                        <div class="level-set has-text-justified">
+                            <p>
+                                Not only can our method reconstructs the scene given image observations, it can also
+                                infer
+                                new
+                                structures unseen by the input images.
+                                Given a query camera as shown as the blue camera, we use its raymap to query the current
+                                state
+                                to read out its corresponding point map.
+                                Adding this inferred point map to the existing reconstruction makes the reconstruction
+                                more
+                                complete.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths"><br><br>
+                    <h2 class="title is-3">Acknowledgements</h2>
+                    <div class="content has-text-justified">
+                        This research is based upon work supported by the Office of the Director of National Intelligence
+                        (ODNI), Intelligence Advanced Research Projects Activity (IARPA), via IARPA R&D Contract
+                        No. 140D0423C0076. The views and conclusions contained herein are those of the authors and
+                        should not be interpreted as necessarily representing the official policies or endorsements, either
+                        expressed or implied, of the ODNI, IARPA, or the U.S. Government. The U.S. Government is
+                        authorized to reproduce and distribute reprints for Governmental purposes notwithstanding any
+                        copyright annotation thereon.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <br>
+
+
+
+
+    <section class="section" id="BibTeX">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered has-text-justified">
+                <div class="column is-four-fifths">
+
+                    <h2 class="title">BibTeX</h2>
+                    <pre><code>
+    @article{shao2025spider,
+        title={SPIDER: Spatial Image CorresponDence Estimator for Robust Calibration},
+        author={Shao, Zhimin and Yadav, Abhay and Chellappa, Rama and Peng, Cheng},
+        journal={arXiv preprint arXiv:2511.17750},
+        year={2025}
+        }
+                    </code></pre>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <footer class="footer">
+        <div align="center" class="container">
+            <div class="columns is-centered">
+                <div class="content">
+                    Design borrowed from <a href="https://github.com/nerfies/nerfies.github.io">nerfies</a>.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
