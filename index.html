@@ -428,8 +428,8 @@
               class="interpolation-image"
               alt="Interpolate start reference image."/>
             <h2 class="subtitle has-text-centered">
-                Visualized in 3D, SPIDER (in green) jointly predicts pixel-wise warps and feature descriptors even across large viewpoint changes, unifying
-                the appearance sensitivity of RoMa (in red) and the geometric consistency of Aerial-MASt3R (in blue) within a single framework. This enables accurate
+                Visualized in 3D, <span style="color:rgb(0, 176, 0, 0.6);">SPIDER</span> jointly predicts pixel-wise warps and feature descriptors even across large viewpoint changes, unifying
+                the appearance sensitivity of <span style="color:rgb(255, 0, 0);">RoMa</span>  and the geometric consistency of <span style="color:rgb(0, 0, 176);">Aerial-MASt3R</span>  within a single framework. This enables accurate
                 camera calibration and pose estimation, achieving and surpassing State-Of-the-Art performance on challenging benchmarks.
             </h2>
           </div>
@@ -482,21 +482,30 @@
         </div>
       </section>
 
-    
+
     <section class="section">
         <div class="container is-max-desktop">
-        <div class="columns is-centered">
+          <div class="columns is-centered">
             <div class="column is-four-fifths">
-            <div class="columns is-centered has-text-centered">
-            <h2 class="title is-4">Evaluation on Zero-Shot Benchmark</h2>
+      
+              <div class="columns is-centered has-text-centered">
+                <h2 class="title is-4">Evaluation on Zero-Shot Benchmark</h2>
+              </div>
+      
+              <figure class="image has-text-centered" style="margin-top: 20px;">
+                <img src="./static/images/table1.png" style="display: inline-block; margin: 0 auto;" />
+                <figcaption style="margin-top: 10px; font-size: 0.9rem;">
+                  SoTA comparison on existing image matching benchmarks, measured by AUC@5. G.R + A.M denotes
+                  the concatenation of GIM-RoMa and Aerial-MASt3R. The best result is marked with <span style="color:rgb(246, 144, 144);">best</span>
+                  and <span style="color:rgb(246, 198, 145);">second best</span>.
+                </figcaption>
+              </figure>
+      
             </div>
-            <img src="./static/images/table1.png"/>
-            <figcaption> SoTA comparison on existing image matching benchmarks, measured by AUC@5. G.R + A.M denotes the concatenation of
-                GIM-RoMa and Aerial-MASt3R. The best result is marked with best in red and second best with second in orange.</figcaption>
+          </div>
         </div>
-        </div>
-    </section>
-
+      </section>
+      
     <section class="section">
         <div class="container is-max-desktop">
         <div class="columns is-centered">
@@ -507,7 +516,7 @@
             <img src="./static/images/vis_example.png"/>
             <figcaption> Visual Comparison under unconstrained settings. Image pattern-driven methods, e.g. RoMa, finds diverse matches
                 across many planes; however, matches may be false negatives on two sides of the building. Geometry-driven methods are better
-                at matching planes. This can lead to homography if a confident plane dominates, e.g., when Aerial-MASt3r matches the wrong signs in
+                at matching planes. This can lead to homography if a confident plane dominates, e.g., when Aerial-MASt3R matches the wrong signs in
                 Urban with high confidence. SPIDER combines both approaches and produces diverse and accurate matches.</figcaption>
         </div>
         </div>
